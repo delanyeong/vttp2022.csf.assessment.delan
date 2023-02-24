@@ -1,1 +1,8 @@
-<p>restaurant-cuisine works!</p>
+<p>List of Asian Restaurants</p>
+
+<ul>
+    <li *ngFor="let g of listOfResByCui">
+      <h4>{{ g }}</h4>
+    </li>
+  </ul>
+<button type="button" [routerLink]="['/cuisines']">Back</button>
