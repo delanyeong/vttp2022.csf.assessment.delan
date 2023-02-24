@@ -43,11 +43,10 @@ public class RestaurantService {
 	// Use the following method to get a list of restaurants by cuisine
 	// You can add any parameters (if any) and the return type 
 	// DO NOT CHNAGE THE METHOD'S NAME
-	public Optional<List<String>> getRestaurantsByCuisine(String cuisine) {
+	public List<String> getRestaurantsByCuisine(String cuisine) {
 		// Implmementation in here
 			Optional<List<Restaurant>> opt = restaurantRepo.getRestaurantsByCuisine(cuisine);
-			if (opt.isEmpty())
-				return Optional.empty();
+			
 
 			List<Restaurant> resListByCui = new LinkedList<>();
 			resListByCui = opt.get();
@@ -56,7 +55,7 @@ public class RestaurantService {
 				resListByCui2.add(res.getName().replace("_","//"));
 			}
 
-		return Optional.of(resListByCui2);
+		return resListByCui2;
 	}
 
 	// TODO Task 4
