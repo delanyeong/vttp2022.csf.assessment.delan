@@ -1,1 +1,2 @@
 TODO: Task 1 - Write the mongo import command here
+mongoimport --uri "mongodb://mongo:tCdddfYBEzKCvqJvgFpx@containers-us-west-64.railway.app:7036/csf" --authenticationDatabase=admin -crestaurants --jsonArray restaurants.json

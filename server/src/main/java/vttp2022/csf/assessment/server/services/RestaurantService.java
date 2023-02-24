@@ -1,5 +1,7 @@
 package vttp2022.csf.assessment.server.services;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,22 +19,44 @@ public class RestaurantService {
 	@Autowired
 	private MapCache mapCache;
 
-	// TODO Task 2 
+	// TODO Task 2 - DONE
 	// Use the following method to get a list of cuisines 
 	// You can add any parameters (if any) and the return type 
 	// DO NOT CHNAGE THE METHOD'S NAME
-	public ??? getCuisines(???) {
+	public Optional<List<String>> getCuisines() {
 		// Implmementation in here
-		
+		Optional<List<String>> opt = restaurantRepo.getCuisines();
+		if (opt.isEmpty())
+			return Optional.empty();
+
+		List<String> listOfCuisines = new LinkedList<>();
+		listOfCuisines = opt.get();
+		List<String> listOfCuisines2 = new LinkedList<>();
+		for (String cuisine : listOfCuisines) {
+			listOfCuisines2.add(cuisine.replace("/","_"));
+		}
+
+		return Optional.of(listOfCuisines2);
 	}
 
-	// TODO Task 3 
+	// TODO Task 3 - DONE
 	// Use the following method to get a list of restaurants by cuisine
 	// You can add any parameters (if any) and the return type 
 	// DO NOT CHNAGE THE METHOD'S NAME
-	public ??? getRestaurantsByCuisine(???) {
+	public Optional<List<String>> getRestaurantsByCuisine(String cuisine) {
 		// Implmementation in here
-		
+			Optional<List<Restaurant>> opt = restaurantRepo.getRestaurantsByCuisine(cuisine);
+			if (opt.isEmpty())
+				return Optional.empty();
+
+			List<Restaurant> resListByCui = new LinkedList<>();
+			resListByCui = opt.get();
+			List<String> resListByCui2 = new LinkedList<>();
+			for (Restaurant res : resListByCui) {
+				resListByCui2.add(res.getName().replace("_","//"));
+			}
+
+		return Optional.of(resListByCui2);
 	}
 
 	// TODO Task 4
