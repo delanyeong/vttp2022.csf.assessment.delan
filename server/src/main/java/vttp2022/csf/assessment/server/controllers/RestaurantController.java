@@ -1,6 +1,7 @@
 package vttp2022.csf.assessment.server.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import vttp2022.csf.assessment.server.models.Restaurant;
 import vttp2022.csf.assessment.server.services.RestaurantService;
 
 @Controller
@@ -36,6 +38,18 @@ public class RestaurantController {
         model.addAttribute("resByCui", resByCui);
 
         return "resByCui";
+    }
+
+    @GetMapping (path="/{restaurant}")
+    public String getRestaurant (@PathVariable String res, Model model) {
+
+        Optional<Restaurant> rest = resSvc.getRestaurant(res);
+
+        Restaurant restt = rest.get();
+
+        model.addAttribute("restt", restt);
+
+        return "restaurant";
     }
 
 }
