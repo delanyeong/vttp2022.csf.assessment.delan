@@ -1,11 +1,19 @@
 package vttp2022.csf.assessment.server.repositories;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -21,6 +29,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+
 import jakarta.json.Json;
 import jakarta.json.JsonArrayBuilder;
 import vttp2022.csf.assessment.server.models.Comment;
@@ -31,6 +44,18 @@ public class RestaurantRepository {
 	
 	@Autowired
 	private MongoTemplate template;
+
+	@Value("${spaces.bucket}")
+	private String spacesBucket;
+
+	@Value("${spaces.endpoint.url}")
+	private String spacesEndpointUrl;
+
+    //18 - go back to PostService
+    @Autowired
+    private AmazonS3 s3;
+
+	private Logger logger = Logger.getLogger(RestaurantRepository.class.getName());
 
 	// For Task 4
 	public static Restaurant createNewRes (Document doc) {
@@ -137,7 +162,6 @@ public class RestaurantRepository {
 		if (!results.iterator().hasNext())
 		  return Optional.empty();
 	   
-		// Get one result only
 		Document doc = results.iterator().next();
 
 		Restaurant task4Res = createNewRes(doc);
@@ -155,26 +179,30 @@ public class RestaurantRepository {
 		// Make the call to url
 		RestTemplate template = new RestTemplate();
 		ResponseEntity<byte[]> resp = template.exchange(req, byte[].class);
+		byte[] mapByte = resp.getBody();
 
-		
-		// so going to hardcode Restaurant Json Object to continue
-		// String fakeName = name;
-		// JsonArrayBuilder arrBuilder = Json.createArrayBuilder();
-		// arrBuilder.add("-73.9985052")
-		// 	.add("40.7141563")
-		// 	.build();
-		// Json.createObjectBuilder()
-        //     .add("restaurant_id", "40827287")
-        //     .add("name", "Ajisen Ramen")
-        //     .add("cuisine", "Asian")
-        //     .add("address", "14, Mott Street, 10013, Manhattan")
-		// 	.add("coordinates", 
-		// 		arrBuilder.add("-73.9985052")
-		// 		.add("40.7141563")
-		// 		.build())
-        //     .build();
+		//upload
+		Map<String, String> userData = new HashMap<>();
+        userData.put("name", task4Res.getName());
 
+		InputStream targetStream = new ByteArrayInputStream(mapByte);
+
+		ObjectMetadata metaData = new ObjectMetadata();
+        // metaData.setContentType(file.getContentType());
+        // metaData.setContentLength(file.getSize());
+
+		PutObjectRequest putReq = new PutObjectRequest(spacesBucket, task4Res.getName(), targetStream, metaData);
+
+		putReq.withCannedAcl(CannedAccessControlList.PublicRead);
+
+		s3.putObject(putReq);
+        // } catch (Exception ex) {
+        //     logger.log(Level.WARNING, "Put S3", ex);
+		// 	return false;
+        // }
 		
+		return Optional.of(task4Res);
+
 	}
 
 	// TODO Task 5
