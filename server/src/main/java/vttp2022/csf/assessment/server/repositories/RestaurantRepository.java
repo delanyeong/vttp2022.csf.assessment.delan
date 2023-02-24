@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.aggregation.ProjectionOperation;
 import org.springframework.data.mongodb.core.aggregation.StringOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -142,20 +143,18 @@ public class RestaurantRepository {
 		Restaurant task4Res = createNewRes(doc);
 
 		String url = UriComponentsBuilder
-    	.fromUriString(url)
-    	.queryParam("name", "fred")
-    	.queryParam("email", "fred@gmail.com")
+    	.fromUriString("http://map.chuklee.com/map")
+    	.queryParam("lat", task4Res.getCoordinates().getLatitude())
+    	.queryParam("lng", task4Res.getCoordinates().getLongitude())
     	.toUriString(); // Build a URL with query parameter. Query parameters will be URL safe
 
-		RequestEntity req = RequestEntity
-			.get("http://map.chuklee.com")
-			.get
+		RequestEntity<Void> req = RequestEntity.get(url)
+			.header(HttpHeaders.ACCEPT, "image/png")
 			.build();
+
 		// Make the call to url
 		RestTemplate template = new RestTemplate();
-		ResponseEntity<String> resp = template.exchange(req, String.class);
-
-
+		ResponseEntity<byte[]> resp = template.exchange(req, byte[].class);
 
 		
 		// so going to hardcode Restaurant Json Object to continue
@@ -174,12 +173,6 @@ public class RestaurantRepository {
 		// 		.add("40.7141563")
 		// 		.build())
         //     .build();
-
-			RequestEntity<String> req = RequestEntity
-					.get("http://map.chuklee.com")
-					// .contentType(MediaType.APPLICATION_JSON)
-					.headers("Accept", MediaType.IMAGE_PNG);
-					// .body(json.toString(), String.class);
 
 		
 	}
